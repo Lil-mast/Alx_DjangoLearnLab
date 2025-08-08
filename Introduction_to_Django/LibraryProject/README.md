@@ -1,25 +1,15 @@
-# Library Management System (Django)
+# LibraryProject
 
-A Django-based web application for managing books, members, and transactions in a library.
+This is a basic Django project created as part of the **ALX Django Learn Lab**. The purpose of this project is to gain familiarity with Django’s structure, tools, and development workflow.
 
-![Django](https://img.shields.io/badge/Django-3.2-green)
-![Python](https://img.shields.io/badge/Python-3.8+-blue)
+## 📚 Project Overview
 
-## Features
-- 📚 Book catalog with search/filter
-- 👥 Member management
-- 🔄 Book borrowing/returning system
-- 📊 Admin dashboard for librarians
-- 🔐 Authentication system (Staff & Members)
+The `LibraryProject` is the starting point for building Django applications. It includes the default Django setup, allowing you to run a development server and understand how Django handles configuration, routing, and management commands.
 
-## Prerequisites
-- Python 3.8+
-- Django 3.2+
-- PostgreSQL (Recommended) / SQLite
+## 🛠️ Setup Instructions
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/libraryproject.git
-   cd libraryproject
+### 1. Clone the Repository
 
+```bash
+git clone https://github.com/your-username/Alx_DjangoLearnLab.git
+cd Alx_DjangoLearnLab/Introduction_to_Django/LibraryProject
