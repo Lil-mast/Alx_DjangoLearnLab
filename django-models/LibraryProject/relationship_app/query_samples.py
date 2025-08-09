@@ -36,7 +36,7 @@ def librarian_for_library():
     library_name = input("\nEnter library name to find its librarian: ")
     try:
         library = Library.objects.get(name=library_name)
-        librarian = library.librarian
+        librarian = Librarian.objects.get(library=library)  # <- ✅ Using get with filter
         print(f"\nLibrarian for '{library_name}': {librarian.name}")
     except Library.DoesNotExist:
         print(f"No library found with name '{library_name}'")
