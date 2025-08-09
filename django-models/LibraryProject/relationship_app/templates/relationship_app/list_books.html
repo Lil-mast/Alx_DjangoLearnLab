@@ -1,22 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{{ library.name }}</title>
+    <title>All Books</title>
 </head>
 <body>
-    <h1>{{ library.name }}</h1>
-    <p>Location: {{ library.location }}</p>
-    
-    <h2>Books Available:</h2>
+    <h1>Book List</h1>
     <ul>
-        {% for book in library.books.all %}
+        {% for book in books %}
         <li>
-            {{ book.title }} by {{ book.author.name }} 
-            (Published {{ book.publication_year }})
+            <strong>{{ book.title }}</strong>
+            <br>Author: {{ book.author.name }}
+            <br>Published: {{ book.publication_year }}
         </li>
         {% empty %}
-        <li>This library has no books.</li>
+        <li>No books available.</li>
         {% endfor %}
     </ul>
 </body>

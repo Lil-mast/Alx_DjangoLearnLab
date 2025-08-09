@@ -16,11 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('relationship_app/', include('relationship_app.urls')),
-    # Redirect both with and without trailing slash
-    path('', RedirectView.as_view(url='relationship_app/books/')),  # Changed to books
 ]
