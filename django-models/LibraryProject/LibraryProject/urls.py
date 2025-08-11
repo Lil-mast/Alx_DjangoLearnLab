@@ -17,7 +17,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from relationship_app.views import (
+    list_books,
+    LibraryDetailView,
+    register_view,
+    login_view,
+    logout_view
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('relationship_app/', include('relationship_app.urls')),
+    # Include the bookshelf app URLs if it exists
+
+     # Homepage
+    path('', list_books, name='list_books'),
+    
+    # Library detail
+    path('library/<int:pk>/', LibraryDetailView.as_view(), name='library_detail'),
+    
+    # Auth URLs (better to keep these in relationship_app/urls.py)
+    path('register/', register_view, name='register'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
+    
 ]

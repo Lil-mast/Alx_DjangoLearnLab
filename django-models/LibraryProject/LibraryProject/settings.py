@@ -12,10 +12,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+LOGIN_REDIRECT_URL = 'list_books'  # Where to redirect after login
+LOGOUT_REDIRECT_URL = 'login'      # Where to redirect after logout
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+LOGIN_REDIRECT_URL = 'list_books'  # Where to redirect after login
+LOGOUT_REDIRECT_URL = 'login'      # Where to redirect after logout
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
