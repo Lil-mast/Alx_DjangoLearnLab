@@ -43,8 +43,8 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
 
     # Book management URLs
-    path('books/add/', add_book, name='add_book'),
-    path('books/<int:pk>/edit/', edit_book, name='edit_book'),
+    path('books/add_book/', add_book, name='add_book'),
+    path('books/<int:pk>/edit_book/', edit_book, name='edit_book'),
     path('books/<int:pk>/delete/', delete_book, name='delete_book'),
 
     # Library URLs
