@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logout</title>
+    <style>
+        .messages { list-style: none; padding: 0; }
+        .messages li { padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .info { background-color: #d9edf7; color: #31708f; }
+    </style>
+</head>
+<body>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
+    <h1>You have been logged out</h1>
+    <p><a href="{% url 'login' %}">Login again</a> or <a href="{% url 'list_books' %}">Go to homepage</a></p>
+</body>
+</html>

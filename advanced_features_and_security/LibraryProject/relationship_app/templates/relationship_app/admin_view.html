@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Portal</h1>
+    <nav>
+        <a href="{% url 'admin_dashboard' %}">Admin</a>
+        <a href="{% url 'librarian_dashboard' %}">Librarian</a>
+        <a href="{% url 'member_dashboard' %}">Member</a>
+    </nav>
+    <p>Welcome, {{ user.username }} (Admin)</p>
+</body>
+</html>

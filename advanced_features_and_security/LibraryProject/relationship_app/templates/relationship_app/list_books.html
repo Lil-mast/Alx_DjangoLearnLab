@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Books</title>
+</head>
+<body>
+    <h1>Book List</h1>
+    <ul>
+        <div class="auth-status">
+    {% if user.is_authenticated %}
+        Welcome, {{ user.username }}! | 
+        <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a> | 
+        <a href="{% url 'register' %}">Register</a>
+    {% endif %}
+</div>
+        {% for book in books %}
+        <li>
+            <strong>{{ book.title }}</strong>
+            <br>Author: {{ book.author.name }}
+            <br>Published: {{ book.publication_year }}
+        </li>
+        {% empty %}
+        <li>No books available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
