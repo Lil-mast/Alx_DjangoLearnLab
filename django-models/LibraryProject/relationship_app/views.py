@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Book
 from .models import Library
 from django.views.generic.edit import CreateView
-
 
 
 # Function-based view (explicitly showing Book.objects.all() as requested)
