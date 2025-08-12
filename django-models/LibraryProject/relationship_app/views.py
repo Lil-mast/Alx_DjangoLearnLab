@@ -1,9 +1,11 @@
+from functools import wraps
 from django.shortcuts import render, redirect
+from django.http import HttpResponseForbidden
 from django.views.generic.detail import DetailView
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Book
@@ -76,3 +78,31 @@ class LibraryDetailView(DetailView):
     
     def get_queryset(self):
         return super().get_queryset().prefetch_related('books__author')
+    
+def role_required(role):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                return HttpResponseForbidden()
+            if not hasattr(request.user, 'profile'):
+                return HttpResponseForbidden()
+            if request.user.profile.role != role:
+                return HttpResponseForbidden()
+            return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+@login_required
+@role_required('ADMIN')
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+@login_required
+@role_required('LIBRARIAN')
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+@login_required
+@role_required('MEMBER')
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
