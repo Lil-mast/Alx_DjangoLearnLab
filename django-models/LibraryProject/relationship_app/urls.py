@@ -3,7 +3,13 @@ from django.contrib.auth.views import LoginView, LogoutView
 from . import views  # Import all views from the current app
 from .views import list_books, LibraryDetailView
 from .views import register_view, login_view, logout_view
-from .views import add_book, edit_book, delete_book
+from .views import(
+    add_book,
+   edit_book,
+     delete_book,
+     list_books,
+     LibraryDetailView
+)
 
 
 urlpatterns = [
@@ -23,4 +29,7 @@ urlpatterns = [
     path('books/add/', add_book, name='add_book'),
     path('books/<int:pk>/edit/', edit_book, name='edit_book'),
     path('books/<int:pk>/delete/', delete_book, name='delete_book'),
+
+    # Library URLs
+    path('library/<int:pk>/', LibraryDetailView.as_view(), name='library_detail'),
 ]
