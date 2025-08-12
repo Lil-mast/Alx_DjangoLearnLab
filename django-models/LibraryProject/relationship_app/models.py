@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver 
 
+
 # Author can write many books (One-to-Many)
 class Author(models.Model):
     name = models.CharField(max_length=100)
@@ -14,18 +15,6 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    publication_year = models.IntegerField()
-    libraries = models.ManyToManyField('Library')
-
-    def __str__(self):
-        return f"{self.title} by {self.author.name}"
-
-class Meta:
-    permisions = [
-        ("can_add_book", "Can add book"),
-        ("can_change_book", "Can change book"),
-        ("can_delete_book", "Can delete book"),
-    ]
 # Library holds many books (Many-to-Many)
 class Library(models.Model):
     name = models.CharField(max_length=100)
@@ -54,3 +43,25 @@ class UserProfile(models.Model):
     
     def __str__(self):
         return f"{self.user.username} ({self.get_role_display()})"
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.ForeignKey('Author', on_delete=models.CASCADE)
+    publication_year = models.IntegerField(
+        null=True,  # Makes field optional
+        blank=True,  # Allows empty in forms
+        help_text="Year of publication"
+    )
+    libraries = models.ManyToManyField('Library')
+    
+    def __str__(self):
+        return f"{self.title} by {self.author.name}"
+
+    class Meta:
+        permissions = [
+            ("can_add_book", "Can add new book"),
+            ("can_change_book", "Can edit existing book"),
+            ("can_delete_book", "Can delete book"),
+            ("can_view_restricted", "Can view restricted books"),
+        ]
+        verbose_name = "Book"
+        verbose_name_plural = "Books"    
