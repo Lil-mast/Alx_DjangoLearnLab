@@ -24,6 +24,7 @@ from relationship_app.views import (
     login_view,
     logout_view
 )
+from relationship_app.views import add_book, edit_book, delete_book
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,5 +41,12 @@ urlpatterns = [
     path('register/', register_view, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
-    
+
+    # Book management URLs
+    path('books/add/', add_book, name='add_book'),
+    path('books/<int:pk>/edit/', edit_book, name='edit_book'),
+    path('books/<int:pk>/delete/', delete_book, name='delete_book'),
+
+    # Library URLs
+    path('library/<int:pk>/', LibraryDetailView.as_view(), name='library_detail'), 
 ]
