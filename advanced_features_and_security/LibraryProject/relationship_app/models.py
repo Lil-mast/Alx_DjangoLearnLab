@@ -84,7 +84,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
-class CustomUser(AbstractUser):
+class CustomUser:
     username = None  # Remove username field (use email instead)
     email = models.EmailField(_('email address'), unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
