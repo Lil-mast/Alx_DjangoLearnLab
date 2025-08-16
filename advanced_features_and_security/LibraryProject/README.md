@@ -1,15 +1,22 @@
-# LibraryProject
+# Permission System Documentation
 
-This is a basic Django project created as part of the **ALX Django Learn Lab**. The purpose of this project is to gain familiarity with Django’s structure, tools, and development workflow.
+## Groups and Permissions
 
-## 📚 Project Overview
+The application uses three main groups with the following permissions:
 
-The `LibraryProject` is the starting point for building Django applications. It includes the default Django setup, allowing you to run a development server and understand how Django handles configuration, routing, and management commands.
+### Viewers
+- `can_view`: Can view books
 
-## 🛠️ Setup Instructions
+### Editors
+- `can_view`: Can view books
+- `can_create`: Can create new books
+- `can_edit`: Can edit existing books
 
-### 1. Clone the Repository
+### Admins
+- All permissions (view, create, edit, delete)
 
-```bash
-git clone https://github.com/your-username/Alx_DjangoLearnLab.git
-cd Alx_DjangoLearnLab/Introduction_to_Django/LibraryProject
+## How to Use
+
+1. **Assign users to groups** via Django admin or programmatically:
+   ```python
+   user.groups.add(Group.objects.get(name='Editors'))
