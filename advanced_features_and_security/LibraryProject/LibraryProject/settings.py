@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+
 LOGIN_REDIRECT_URL = 'list_books'  # Where to redirect after login
 LOGOUT_REDIRECT_URL = 'login'      # Where to redirect after logout
 
@@ -109,6 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_PROFILE_MODULE = 'relationship_app.UserProfile'
 AUTH_USER_MODEL = 'relationship_app.CustomUser'  # Use custom user model
+AUTH_USER_MODEL = 'bookshelf.CustomUser'  # Use custom user model from bookshelf app
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
