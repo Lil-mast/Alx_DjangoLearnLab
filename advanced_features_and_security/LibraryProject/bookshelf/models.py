@@ -10,7 +10,7 @@ class Book(models.Model):
 def __str__(self):
         return self.title
 
-class CustomUser:
+class CustomUser(AbstractUser):
     username = None  # Remove username field (use email instead)
     email = models.EmailField(_('email address'), unique=True)
     date_of_birth = models.DateField(null=True, blank=True)
