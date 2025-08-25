@@ -1,0 +1,50 @@
+### 1. Get Token (Authentication)
+POST http://127.0.0.1:8000/api/auth-token/
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "testpassword"
+}
+
+### 2. Get all books (should work without auth - AllowAny)
+GET http://127.0.0.1:8000/api/books/
+Accept: application/json
+
+### 3. Try to create book WITHOUT token (should fail - 401 Unauthorized)
+POST http://127.0.0.1:8000/api/books_all/
+Content-Type: application/json
+
+{
+    "title": "Unauthorized Book",
+    "author": "Anonymous"
+}
+
+### 4. Create book WITH token (replace {token} with actual token from step 1)
+POST http://127.0.0.1:8000/api/books_all/
+Content-Type: application/json
+Authorization: Token {your-token-here}
+
+{
+    "title": "Authenticated Book",
+    "author": "Authenticated Author"
+}
+
+### 5. Get books from ViewSet (requires auth)
+GET http://127.0.0.1:8000/api/books_all/
+Authorization: Token {your-token-here}
+Accept: application/json
+
+### 6. Update a book (requires auth)
+PUT http://127.0.0.1:8000/api/books_all/1/
+Content-Type: application/json
+Authorization: Token {your-token-here}
+
+{
+    "title": "Updated Authenticated Book",
+    "author": "Updated Author"
+}
+
+### 7. Delete a book (requires auth)
+DELETE http://127.0.0.1:8000/api/books_all/1/
+Authorization: Token {your-token-here}
