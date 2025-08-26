@@ -29,3 +29,41 @@ Use Basic Authentication or Session Authentication for protected endpoints:
 
 ```bash
 curl -u username:password http://localhost:8000/api/books/create/
+
+# Advanced API Project - Filtering, Searching & Ordering
+
+## Enhanced Book API Endpoints
+
+### Filtering Capabilities
+
+The Book list endpoint supports advanced filtering:
+
+#### Basic Filtering:
+- `?publication_year=1997` - Exact year match
+- `?author=1` - Books by specific author ID
+- `?author_name=rowling` - Books by author name (case-insensitive contains)
+
+#### Range Filtering:
+- `?publication_year__gt=2000` - Years greater than 2000
+- `?publication_year__lt=2020` - Years less than 2020
+- `?publication_year__gte=1990&publication_year__lte=2000` - Years between 1990-2000
+
+#### Title Filtering:
+- `?title=potter` - Books with "potter" in title (case-insensitive)
+
+### Search Functionality
+
+Full-text search across multiple fields:
+- `?search=harry` - Search in title and author name fields
+- Supports: exact match, starts-with, and case-sensitive variants
+
+### Ordering Options
+
+Sort results by various fields:
+- `?ordering=title` - Ascending by title
+- `?ordering=-publication_year` - Descending by publication year
+- `?ordering=author__name,title` - Multiple field ordering
+
+### Combined Parameters
+
+All parameters can be combined:
