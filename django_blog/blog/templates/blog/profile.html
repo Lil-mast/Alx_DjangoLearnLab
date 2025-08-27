@@ -1,0 +1,33 @@
+<!-- blog/templates/blog/profile.html -->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="profile-container">
+    <h2>Profile</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ user_form.username.label_tag }}
+            {{ user_form.username }}
+            {% if user_form.username.errors %}
+                <div class="error">{{ user_form.username.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ user_form.email.label_tag }}
+            {{ user_form.email }}
+            {% if user_form.email.errors %}
+                <div class="error">{{ user_form.email.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ profile_form.bio.label_tag }}
+            {{ profile_form.bio }}
+            {% if profile_form.bio.errors %}
+                <div class="error">{{ profile_form.bio.errors }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+</div>
+{% endblock %}
