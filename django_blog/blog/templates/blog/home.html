@@ -1,0 +1,15 @@
+<!-- blog/templates/blog/home.html -->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <h2>Latest Posts</h2>
+    {% for post in posts %}
+        <article>
+            <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+            <p>By {{ post.author.username }} on {{ post.published_date }}</p>
+            <p>{{ post.content|truncatewords:30 }}</p>
+        </article>
+    {% empty %}
+        <p>No posts yet.</p>
+    {% endfor %}
+{% endblock %}
