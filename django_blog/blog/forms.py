@@ -94,3 +94,40 @@ class PostForm(forms.ModelForm):
         if len(content) < 50:
             raise forms.ValidationError("Content must be at least 50 characters long.")
         return content
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Write your comment here...',
+                'rows': 4,
+                'maxlength': 1000
+            })
+        }
+        labels = {
+            'content': 'Your Comment'
+        }
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        if len(content.strip()) < 10:
+            raise forms.ValidationError("Comment must be at least 10 characters long.")
+        if len(content.strip()) > 1000:
+            raise forms.ValidationError("Comment cannot exceed 1000 characters.")
+        return content
+
+class CommentUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'maxlength': 1000
+            })
+        }

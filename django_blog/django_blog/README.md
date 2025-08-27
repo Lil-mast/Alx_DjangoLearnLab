@@ -92,3 +92,60 @@ This Django blog application features a complete user authentication system with
 - Try editing another user's post (should fail)
 - Try deleting another user's post (should fail)
 - Try creating post without logging in (should redirect to login)
+
+## Comment System
+
+### Features
+- **Add Comments**: Authenticated users can comment on blog posts
+- **Edit Comments**: Comment authors can edit their own comments
+- **Delete Comments**: Comment authors can delete their own comments (soft delete)
+- **Like Comments**: Users can like/unlike comments
+- **Real-time Updates**: AJAX-based like functionality
+
+### Permissions
+- **Public Access**: Anyone can view comments
+- **Authenticated Users**: Can add comments and like/unlike comments
+- **Comment Authors**: Can edit and delete their own comments
+
+### URL Endpoints
+
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|---------|
+| `/posts/<int:pk>/comment/` | POST | Add comment to post | Authenticated |
+| `/comments/<int:pk>/edit/` | GET/POST | Edit comment | Author only |
+| `/comments/<int:pk>/delete/` | GET/POST | Delete comment | Author only |
+| `/comments/<int:pk>/like/` | POST | Like/unlike comment | Authenticated |
+
+### Testing Comment Functionality
+
+#### 1. Add Comment Test
+1. Log in with valid credentials
+2. Navigate to any post detail page
+3. Fill in comment form and submit
+4. Verify comment appears in comments section
+
+#### 2. Edit Comment Test
+1. Log in as comment author
+2. Navigate to post with your comment
+3. Click "Edit" on your comment
+4. Modify content and submit
+5. Verify changes persist
+
+#### 3. Delete Comment Test
+1. Log in as comment author
+2. Navigate to post with your comment
+3. Click "Delete" on your comment
+4. Confirm deletion
+5. Verify comment is removed
+
+#### 4. Like Comment Test
+1. Log in with valid credentials
+2. Navigate to any post with comments
+3. Click like button on a comment
+4. Verify like count updates
+5. Click again to unlike
+
+#### 5. Permission Tests
+- Try editing another user's comment (should fail)
+- Try deleting another user's comment (should fail)
+- Try commenting without logging in (should see login prompt)

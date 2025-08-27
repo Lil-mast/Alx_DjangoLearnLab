@@ -1,15 +1,19 @@
 # blog/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
+from django.urls import reverse, reverse_lazy
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from .models import Post
 from .models import Profile
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponseRedirect, JsonResponse
+from .models import Comment
+from .forms import CommentForm, CommentUpdateForm
 
 
 
@@ -123,3 +127,79 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Your post has been deleted successfully!')
         return super().delete(request, *args, **kwargs)
+
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comment_form'] = CommentForm()
+        context['comments'] = self.object.comments.filter(is_active=True)
+        return context
+
+@login_required
+def add_comment(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            messages.success(request, 'Your comment has been added successfully!')
+            return HttpResponseRedirect(reverse('post_detail', kwargs={'pk': post.pk}) + f'#comment-{comment.id}')
+        else:
+            messages.error(request, 'There was an error with your comment. Please try again.')
+    
+    return HttpResponseRedirect(reverse('post_detail', kwargs={'pk': post.pk}))
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentUpdateForm
+    template_name = 'blog/comment_form.html'
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Your comment has been updated successfully!')
+        return super().form_valid(form)
+    
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+    
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.object.post.pk}) + f'#comment-{self.object.id}'
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+    
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+    
+    def delete(self, request, *args, **kwargs):
+        comment = self.get_object()
+        comment.is_active = False  # Soft delete
+        comment.save()
+        messages.success(request, 'Your comment has been deleted successfully!')
+        return HttpResponseRedirect(self.get_success_url())
+    
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.object.post.pk})
+
+@login_required
+def like_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    
+    if comment.likes.filter(id=request.user.id).exists():
+        comment.likes.remove(request.user)
+        liked = False
+    else:
+        comment.likes.add(request.user)
+        liked = True
+    
+    return JsonResponse({'liked': liked, 'likes_count': comment.likes.count()})
