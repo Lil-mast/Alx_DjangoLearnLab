@@ -232,15 +232,16 @@ def like_comment(request, pk):
 
 def search_posts(request):
     query = request.GET.get('q', '')
-    posts = Post.objects.all()
     
+    # Using Post.objects.filter for search functionality
     if query:
-        # Search in title, content, and tags
-        posts = posts.filter(
+        posts = Post.objects.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
             Q(tags__name__icontains=query)
-        ).distinct()
+        ).distinct().order_by('-published_date')
+    else:
+        posts = Post.objects.all().order_by('-published_date')
     
     context = {
         'posts': posts,
@@ -253,9 +254,144 @@ def posts_by_tag(request, slug):
     tag = get_object_or_404(Tag, slug=slug)
     posts = tag.posts.all()
     
+    posts = Post.objects.filter(tags=tag).order_by('-published_date')
+
+
     context = {
         'tag': tag,
         'posts': posts,
         'results_count': posts.count()
     }
     return render(request, 'blog/posts_by_tag.html', context)
+
+def posts_by_author(request, username):
+    author = get_object_or_404(User, username=username)
+    
+    # Using Post.objects.filter to get posts by author
+    posts = Post.objects.filter(author=author).order_by('-published_date')
+    
+    context = {
+        'author': author,
+        'posts': posts,
+        'results_count': posts.count()
+    }
+    return render(request, 'blog/posts_by_author.html', context)
+
+def latest_posts(request):
+    # Using Post.objects.filter to get recent posts (last 7 days)
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    one_week_ago = timezone.now() - timedelta(days=7)
+    posts = Post.objects.filter(published_date__gte=one_week_ago).order_by('-published_date')
+    
+    context = {
+        'posts': posts,
+        'time_period': 'last 7 days'
+    }
+    return render(request, 'blog/latest_posts.html', context)
+
+def popular_posts(request):
+    # Using Post.objects.filter with annotation for popular posts (most comments)
+    from django.db.models import Count
+    
+    posts = Post.objects.annotate(comment_count=Count('comments')).filter(comment_count__gt=0).order_by('-comment_count')[:10]
+    
+    context = {
+        'posts': posts,
+        'title': 'Most Discussed Posts'
+    }
+    return render(request, 'blog/popular_posts.html', context)
+
+def posts_with_tag_count(request):
+    # Using Post.objects.filter to demonstrate complex filtering
+    # Get posts that have at least 2 tags and were published recently
+    from django.utils import timezone
+    from datetime import timedelta
+    from django.db.models import Count
+    
+    one_month_ago = timezone.now() - timedelta(days=30)
+    
+    posts = Post.objects.filter(
+        published_date__gte=one_month_ago
+    ).annotate(
+        tag_count=Count('tags')
+    ).filter(
+        tag_count__gte=2
+    ).order_by('-published_date')
+    
+    context = {
+        'posts': posts,
+        'title': 'Recent Posts with Multiple Tags'
+    }
+    return render(request, 'blog/tagged_posts.html', context)
+
+# Utility function using Post.objects.filter
+def get_recent_posts(limit=5):
+    """Utility function to get recent posts using Post.objects.filter"""
+    return Post.objects.all().order_by('-published_date')[:limit]
+
+def get_popular_tags(limit=10):
+    """Utility function to get popular tags using Post.objects.filter and aggregation"""
+    from django.db.models import Count
+    return Tag.objects.annotate(post_count=Count('posts')).filter(post_count__gt=0).order_by('-post_count')[:limit]
+
+# Admin-style views using Post.objects.filter
+@login_required
+def my_posts(request):
+    """View showing only the current user's posts using Post.objects.filter"""
+    posts = Post.objects.filter(author=request.user).order_by('-published_date')
+    
+    context = {
+        'posts': posts,
+        'title': 'My Posts'
+    }
+    return render(request, 'blog/post_list.html', context)
+
+@login_required
+def draft_posts(request):
+    """View showing draft posts (optional field would need to be added to model)"""
+    # If you add a 'status' field to Post model, you could use:
+    # posts = Post.objects.filter(author=request.user, status='draft').order_by('-created_date')
+    posts = Post.objects.filter(author=request.user)  # Placeholder
+    
+    context = {
+        'posts': posts,
+        'title': 'My Drafts'
+    }
+    return render(request, 'blog/post_list.html', context)
+
+# Advanced filtering examples
+def advanced_search(request):
+    """Advanced search with multiple filters using Post.objects.filter"""
+    query = request.GET.get('q', '')
+    tag_name = request.GET.get('tag', '')
+    author_name = request.GET.get('author', '')
+    
+    # Start with all posts
+    posts = Post.objects.all()
+    
+    # Apply filters based on query parameters
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query)
+        )
+    
+    if tag_name:
+        posts = posts.filter(tags__name__icontains=tag_name)
+    
+    if author_name:
+        posts = posts.filter(author__username__icontains=author_name)
+    
+    # Order by publication date
+    posts = posts.order_by('-published_date')
+    
+    context = {
+        'posts': posts,
+        'query': query,
+        'tag_filter': tag_name,
+        'author_filter': author_name,
+        'results_count': posts.count()
+    }
+    return render(request, 'blog/advanced_search.html', context)
