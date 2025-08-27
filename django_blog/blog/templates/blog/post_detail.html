@@ -1,0 +1,28 @@
+<!-- blog/templates/blog/post_detail.html -->
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="post-detail-container">
+    <article class="post-detail">
+        <h1 class="post-title">{{ post.title }}</h1>
+        <div class="post-meta">
+            <span class="author">By {{ post.author.username }}</span>
+            <span class="date">{{ post.published_date|date:"F d, Y H:i" }}</span>
+        </div>
+        <div class="post-content">
+            {{ post.content|linebreaks }}
+        </div>
+        
+        {% if user == post.author %}
+            <div class="post-actions">
+                <a href="{% url 'post_update' post.pk %}" class="btn btn-primary">Edit Post</a>
+                <a href="{% url 'post_delete' post.pk %}" class="btn btn-danger">Delete Post</a>
+            </div>
+        {% endif %}
+    </article>
+
+    <div class="navigation-links">
+        <a href="{% url 'post_list' %}" class="btn btn-outline">← Back to All Posts</a>
+    </div>
+</div>
+{% endblock %}
