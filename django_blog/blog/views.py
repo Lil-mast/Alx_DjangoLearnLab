@@ -14,6 +14,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseRedirect, JsonResponse
 from .models import Comment
 from .forms import CommentForm, CommentUpdateForm
+from django.db.models import Q
+from django.shortcuts import render
+from .models import Post, Tag
 
 
 
@@ -224,3 +227,35 @@ def like_comment(request, pk):
         liked = True
     
     return JsonResponse({'liked': liked, 'likes_count': comment.likes.count()})
+
+
+
+def search_posts(request):
+    query = request.GET.get('q', '')
+    posts = Post.objects.all()
+    
+    if query:
+        # Search in title, content, and tags
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    
+    context = {
+        'posts': posts,
+        'query': query,
+        'results_count': posts.count()
+    }
+    return render(request, 'blog/search_results.html', context)
+
+def posts_by_tag(request, slug):
+    tag = get_object_or_404(Tag, slug=slug)
+    posts = tag.posts.all()
+    
+    context = {
+        'tag': tag,
+        'posts': posts,
+        'results_count': posts.count()
+    }
+    return render(request, 'blog/posts_by_tag.html', context)

@@ -149,3 +149,62 @@ This Django blog application features a complete user authentication system with
 - Try editing another user's comment (should fail)
 - Try deleting another user's comment (should fail)
 - Try commenting without logging in (should see login prompt)
+
+## Tagging and Search Features
+
+### Tagging System
+
+#### Features
+- **Tag Management**: Create, edit, and delete tags
+- **Tag Association**: Multiple tags per post, multiple posts per tag
+- **Tag Navigation**: Click tags to view all posts with that tag
+- **Tag Cloud**: Visual display of all available tags
+
+#### How to Use Tags
+1. **Adding Tags**: When creating/editing a post, enter tags separated by commas
+2. **Viewing Tags**: Tags appear below post titles and can be clicked to filter posts
+3. **Managing Tags**: Tags are automatically created when used and managed through the admin interface
+
+#### URL Endpoints
+- `/tags/<slug:slug>/` - View all posts with a specific tag
+
+### Search Functionality
+
+#### Features
+- **Full-text Search**: Search across post titles, content, and tags
+- **Instant Results**: Real-time search results
+- **Advanced Filtering**: Complex query lookups using Django's Q objects
+
+#### How to Use Search
+1. **Search Bar**: Use the search bar in the navigation menu
+2. **Search Terms**: Enter keywords, phrases, or tag names
+3. **Results**: View filtered posts matching your search criteria
+
+#### URL Endpoints
+- `/search/?q=query` - Search for posts containing the query
+
+### Testing Guidelines
+
+#### Tagging Tests
+1. **Create Post with Tags**: Verify tags are saved and displayed correctly
+2. **Edit Post Tags**: Verify tag updates persist
+3. **Tag Navigation**: Click tags to verify filtering works
+4. **Duplicate Tags**: Test handling of duplicate tag names
+
+#### Search Tests
+1. **Basic Search**: Test searching by title keywords
+2. **Content Search**: Test searching by content phrases
+3. **Tag Search**: Test searching by tag names
+4. **Empty Results**: Test search with no matches
+5. **Special Characters**: Test search with special characters
+
+### Database Schema
+The tagging system uses a many-to-many relationship:
+- `Tag` model with name and slug fields
+- `Post.tags` field linking to Tag model
+- Automatic slug generation for SEO-friendly URLs
+
+### Performance Considerations
+- Indexes on frequently searched fields
+- Distinct results to avoid duplicates
+- Pagination for large result sets
