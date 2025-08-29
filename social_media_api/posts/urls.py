@@ -21,4 +21,5 @@ urlpatterns = [
     # Post like endpoints
     path('posts/<int:pk>/like/', views.PostViewSet.as_view({'post': 'like'}), name='post_like'),
     path('posts/<int:pk>/likes/', views.PostViewSet.as_view({'get': 'likes'}), name='post_likes'),
+    path('posts/<int:pk>/unlike/', views.PostViewSet.as_view({'post': 'like'}), name='post_unlike'),
 ]
