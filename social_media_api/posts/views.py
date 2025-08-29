@@ -317,3 +317,39 @@ def trending_posts(request):
         'message': 'Trending posts from the last 7 days',
         'posts': serializer.data
     })
+
+# Additional endpoint for direct like creation
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def create_like(request, post_id):
+    """
+    Create a like using Like.objects.get_or_create pattern
+    """
+    # Using generics.get_object_or_404 as requested
+    post = generics.get_object_or_404(Post, id=post_id)
+    
+    # Using Like.objects.get_or_create as requested
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+    
+    if created:
+        # Using Notification.objects.create as requested
+        if post.author != request.user:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=request.user,
+                verb=Notification.LIKE,
+                target=post,
+                timestamp=timezone.now()
+            )
+        
+        return Response({
+            'message': 'Post liked successfully',
+            'like_id': like.id,
+            'like_count': post.likes_received.count(),
+            'notification_created': post.author != request.user
+        }, status=status.HTTP_201_CREATED)
+    else:
+        return Response({
+            'message': 'You have already liked this post',
+            'like_count': post.likes_received.count()
+        }, status=status.HTTP_200_OK)
