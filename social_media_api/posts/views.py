@@ -9,7 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Q
 from django.contrib.auth import get_user_model
-from .models import Post, Comment
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, PostCreateSerializer
 from .permissions import IsAuthorOrReadOnly
 
@@ -218,4 +218,80 @@ def trending_posts(request):
     return Response({
         'message': 'Trending posts from the last 7 days',
         'posts': serializer.data
+    })
+
+
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+
+        if post.likes_received.filter(user=user).exists():
+            # Unlike the post
+            like = post.likes_received.get(user=user)
+            like.delete()
+            message = 'Post unliked'
+            liked = False
+        else:
+            # Like the post
+            like = Like.objects.create(user=user, post=post)
+            message = 'Post liked'
+            liked = True
+
+        return Response({
+            'message': message,
+            'liked': liked,
+            'like_count': post.likes_received.count()
+        })
+
+    @action(detail=True, methods=['get'])
+    def likes(self, request, pk=None):
+        """Get all likes for a post"""
+        post = self.get_object()
+        likes = post.likes_received.all()
+        serializer = LikeSerializer(likes, many=True)
+        return Response({
+            'post_id': post.id,
+            'like_count': likes.count(),
+            'likes': serializer.data
+        })
+
+# Add LikeViewSet for additional like management
+class LikeViewSet(viewsets.ModelViewSet):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Like.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        post_id = self.request.data.get('post')
+        post = get_object_or_404(Post, id=post_id)
+        
+        # Check if already liked
+        if Like.objects.filter(user=self.request.user, post=post).exists():
+            return Response(
+                {'error': 'You have already liked this post'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer.save(user=self.request.user, post=post)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_likes(request):
+    """Get all posts liked by the current user"""
+    likes = Like.objects.filter(user=request.user).select_related('post')
+    posts = [like.post for like in likes]
+    
+    serializer = PostSerializer(
+        posts, 
+        many=True, 
+        context={'request': request}
+    )
+    
+    return Response({
+        'total_likes': likes.count(),
+        'liked_posts': serializer.data
     })
