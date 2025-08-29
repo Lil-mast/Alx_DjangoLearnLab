@@ -81,3 +81,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
                  'bio', 'profile_picture', 'follower_count', 'following_count',
                  'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at', 'updated_at')
+
+class UserFollowSerializer(serializers.ModelSerializer):
+    follower_count = serializers.ReadOnlyField()
+    following_count = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'username', 'first_name', 'last_name', 
+                 'follower_count', 'following_count')

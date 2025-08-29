@@ -5,7 +5,8 @@ from rest_framework import status, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.contrib.auth import login, logout
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
+from django.shortcuts import get_object_or_404
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer, UserFollowSerializer
 from .models import CustomUser
 
 @api_view(['POST'])
@@ -68,3 +69,113 @@ def follow_user(request, user_id):
     else:
         request.user.following.add(user_to_follow)
         return Response({'message': 'Followed user'}, status=status.HTTP_200_OK)
+
+
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def follow_user(request, user_id):
+    """
+    Follow another user
+    """
+    try:
+        user_to_follow = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.user == user_to_follow:
+        return Response({'error': 'Cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.user.follow(user_to_follow):
+        return Response({
+            'message': f'Successfully followed {user_to_follow.username}',
+            'following': True,
+            'followers_count': user_to_follow.follower_count,
+            'following_count': request.user.following_count
+        }, status=status.HTTP_200_OK)
+    else:
+        return Response({
+            'message': f'Already following {user_to_follow.username}',
+            'following': True
+        }, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unfollow_user(request, user_id):
+    """
+    Unfollow another user
+    """
+    try:
+        user_to_unfollow = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    if request.user.unfollow(user_to_unfollow):
+        return Response({
+            'message': f'Successfully unfollowed {user_to_unfollow.username}',
+            'following': False,
+            'followers_count': user_to_unfollow.follower_count,
+            'following_count': request.user.following_count
+        }, status=status.HTTP_200_OK)
+    else:
+        return Response({
+            'message': f'Not following {user_to_unfollow.username}',
+            'following': False
+        }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_followers(request, user_id=None):
+    """
+    Get followers of a user (current user if no ID provided)
+    """
+    if user_id:
+        user = get_object_or_404(CustomUser, id=user_id)
+    else:
+        user = request.user
+    
+    followers = user.followers.all()
+    serializer = UserFollowSerializer(followers, many=True)
+    return Response({
+        'user': user.username,
+        'followers_count': user.follower_count,
+        'followers': serializer.data
+    })
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_following(request, user_id=None):
+    """
+    Get users that a user is following (current user if no ID provided)
+    """
+    if user_id:
+        user = get_object_or_404(CustomUser, id=user_id)
+    else:
+        user = request.user
+    
+    following = user.following
+    serializer = UserFollowSerializer(following, many=True)
+    return Response({
+        'user': user.username,
+        'following_count': user.following_count,
+        'following': serializer.data
+    })
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def check_follow_status(request, user_id):
+    """
+    Check if current user is following another user
+    """
+    try:
+        target_user = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    is_following = request.user.is_following(target_user)
+    return Response({
+        'is_following': is_following,
+        'target_user': target_user.username,
+        'current_user': request.user.username
+    })
